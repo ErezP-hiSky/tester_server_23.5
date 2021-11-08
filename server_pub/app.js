@@ -2,7 +2,7 @@ var createError = require("http-errors")
 const bodyParser = require('body-parser');
 var express = require("express");
 const connectDB = require('./config/db');
-var path = require("path")
+var path = require("path");
 const mongoose = require('mongoose');
 var cookieParser = require("cookie-parser")
 var logger = require("morgan")
@@ -10,16 +10,18 @@ var logger = require("morgan")
 // Define routes
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-// var generalTest = require("./routes/generalData");
+var authUsersRouter = require('./routes/auth_users');
+var authRouter = require('./routes/auth');
+var articleRouter = require("./routes/article");
+var generalRouter = require("./routes/generalData");
+var generalPassRouter = require("./routes/generalData/generalPass");
+var generalFailRouter = require("./routes/generalData/generalFail");
+var testerNameRouter = require("./routes/testerName");
+var macRouter = require('./routes/mac');
 
 var app = express();
 connectDB();
 
-app.use(express.static(path.join(__dirname, "build")))
-
-app.get("/react", (req, res) => {
- res.sendFile(path.join(__dirname, "build", "index.html"))
-});
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"))
@@ -32,9 +34,18 @@ app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, "public")))
 
-app.use("/", indexRouter)
-// app.use("/general-test-data", generalTest);
-// app.use("/users", usersRouter)
+// app.use("/", indexRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/auth_users", authUsersRouter);
+app.use("/api/auth", authRouter);
+app.use("/articles", articleRouter);
+app.use("/general-test-data", generalRouter);
+app.use("/general-test-data/only_pass", generalPassRouter);
+app.use("/general-test-data/only_fail", generalFailRouter);
+app.use("/general-test-data", generalRouter);
+app.use("/api/testerNames", testerNameRouter);
+app.use("/api/mac", macRouter);
+
 
 // const mongoPwd = "MG841752!";
 // const dbName = "testDB";
@@ -42,333 +53,6 @@ app.use("/", indexRouter)
 // mongoose.connect(mongoConString, { useNewUrlParser: true, useUnifiedTopology: true })
 //     .catch(err => console.log(`Error in connection or no internet... The error is: ${err}`));
 
-// ----------------------------------- Users -------------------
-const userSchema = {
-    email: String,
-    password: String
-};
-
-const User = mongoose.model("User", userSchema);
-
-app.route("/users")
-
-    .get(function(req, res) {
-        
-        User.find(function(err, foundUser) {
-            if (!err) {
-                res.send(foundUser);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    })
-
-    .post(function(req, res){
-        console.log(req.body);
-        const newUser = new User({
-            email: req.body.email,
-            password: req.body.password
-        });
-        console.log(newUser)
-        newUser.save(function(err) {
-            if(!err){
-                res.send("successfully saved");
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-// ----------------------------------- Articles -------------------
-const ArticleSchema = {
-    title: String,
-    content: String
-};
-
-const Article = mongoose.model("Article", ArticleSchema);
-
-app.route("/articles")
-
-.get(function(req, res) {
-    Article.find(function(err, foundArticles) {
-        if (!err) {
-            res.send(foundArticles);
-        } else {
-            res.send("The error is: " + err);
-        }
-    });
-})
-
-.post(function(req, res) {
-    
-    const newArticle = new Article({
-        title: req.body.title,
-        content: req.body.content
-    });
-    console.log(newArticle)
-    newArticle.save(function(err) {
-        if(!err){
-            res.send("successfully saved");
-        } else {
-            res.send("The error is: " + err);
-        }
-    });
-});
-
-
-// ----------------------------------- general_tester_data -------------------
-const generalTestDataSchema = {
-    _id: Number,
-    testerName: Number,
-    testDate: Date,
-    unitSN: Number,
-    finalTestResult: String
-};
-generalTestDataCollectionName = "general_tester_data";
-
-const GeneralTestDataTemp = mongoose.model("GeneralTestDataTemp", generalTestDataSchema, generalTestDataCollectionName);
-
-app.route("/general-test-data")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find(function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_finished")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find({final_test_result: {$ne: "started"}}, function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_pass")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find({final_test_result: {$eq: "pass"}}, function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_pass/tester/:tester_name")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find(
-            {
-                final_test_result: {$eq: "pass"},
-                Tester_name: {$eq: req.params.tester_name}
-            }, function(err, foundGeneralTestDataTemp
-                ) 
-                {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_pass/tester/:tester_name/date_from/:dateFrom/date_to/:dateTo")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find(
-            {
-                final_test_result: {$eq: "pass"},
-                Tester_name: {$eq: req.params.tester_name},
-                Test_Date: {$gte: new Date(req.params.dateFrom), 
-                    $lte: new Date(req.params.dateTo)}
-            }, function(err, foundGeneralTestDataTemp
-                ) 
-                {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_fail")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find({final_test_result: {$eq: "fail"}}, function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_fail/tester/:tester_name")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find(
-            {
-                final_test_result: {$eq: "fail"},
-                Tester_name: {$eq: req.params.tester_name}
-            }, 
-            function(err, foundGeneralTestDataTemp) 
-            {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_fail/tester/:tester_name/date_from/:dateFrom/date_to/:dateTo")
-// Test_Date: {$gte: new Date(req.params.DateFrom), 
-// $lte: new Date(req.params.DateTo)},
-    .get(function(req, res) {
-        GeneralTestDataTemp.find(
-            {
-                final_test_result: {$eq: "fail"},
-                Tester_name: {$eq: req.params.tester_name},
-                Test_Date: {$gte: new Date(req.params.dateFrom), 
-                    $lte: new Date(req.params.dateTo)}
-            }, 
-            function(err, foundGeneralTestDataTemp) 
-            {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_fail/tests/:tests")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find(
-            {
-                final_test_result: {$eq: "fail"},
-                tests_failed: {$in: [req.params.tests]}
-            }, function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_fail/tests/:tests/tester/:tester_name")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find(
-            {
-                final_test_result: {$eq: "fail"},
-                tests_failed: {$in: [req.params.tests]},
-                Tester_name: {$eq: req.params.tester_name}
-            }, function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/only_fail/tests/:tests/tester/:tester_name/date_from/:dateFrom/date_to/:dateTo")
-
-    .get(function(req, res) {
-        GeneralTestDataTemp.find(
-            {
-                final_test_result: {$eq: "fail"},
-                tests_failed: {$in: [req.params.tests]},
-                Tester_name: {$eq: req.params.tester_name},
-                Test_Date: {$gte: new Date(req.params.dateFrom), 
-                    $lte: new Date(req.params.dateTo)}
-            }, function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-
-app.route("/general-test-data/findbyUnitSN/:unitSN")
-
-    .get(function (req, res) {
-        // console.log("/general-test-data/findbyUnitSN");
-        // console.log(req.params.unitSN);
-        GeneralTestDataTemp.find({unit_SN: { $eq: req.params.unitSN }, final_test_result: {$ne: "started"}}, function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                // console.log(`found is ${foundGeneralTestDataTemp}`);
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-
-app.route("/general-test-data/findbyUnitSNrange/:unitSNfrom/:unitSNto")
-
-    .get(function (req, res) {
-        GeneralTestDataTemp.find({unit_SN: { $gte: req.params.unitSNfrom, 
-                    $lte: req.params.unitSNto },
-                    final_test_result: {$ne: "started"}}, 
-                    function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                // console.log(`found is ${foundGeneralTestDataTemp}`);
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-app.route("/general-test-data/findbyUnitSNrangeNdate/:unitSNfrom/:unitSNto/dateFrom/:DateFrom/dateTo/:DateTo")
-// Test_Date: {$gte: new Date(req.params.DateFrom), 
-// $lte: new Date(req.params.DateTo)},
-    .get(function (req, res) {
-        GeneralTestDataTemp.find({ unit_SN: { $gte: req.params.unitSNfrom, 
-                    $lte: req.params.unitSNto },
-                    Test_Date: {$gte: new Date(req.params.DateFrom), 
-                        $lte: new Date(req.params.DateTo)},
-                    final_test_result: {$ne: "started"}}, 
-                    function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                // console.log(`found is ${foundGeneralTestDataTemp}`);
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
-
-
-app.route("/general-test-data/findbyid/:collectionId")
-    
-    .get(function (req, res) {
-        GeneralTestDataTemp.findById(req.params.collectionId, function(err, foundGeneralTestDataTemp) {
-            if (!err) {
-                res.send(foundGeneralTestDataTemp);
-            } else {
-                res.send("The error is: " + err);
-            }
-        });
-    });
 
 // ----------------------------------- AmbientTemp -------------------
 const AmbientTempSchema = {
@@ -656,7 +340,7 @@ app.route("/temp-changes/findbyid/:collectionId")
         });
     });
 
-// ----------------------------------- imu_gps_status -------------------
+// ----------------------------------- imu_status -------------------
 
 const ImuGpsSchema = {
     _id: Number,
@@ -674,6 +358,30 @@ app.route("/imugps/findbyid/:collectionId")
         ImuGps.findById(req.params.collectionId, function(err, foundImuGps) {
             if (!err) {
                 res.send(foundImuGps);
+            } else {
+                res.send("The error is: " + err);
+            }
+        });
+    });
+
+// ----------------------------------- gps_status -------------------
+
+const GpsSchema = {
+    _id: Number,
+    start_time: Date,
+    temp: Number,
+    end_time: Date
+};
+GpsCollectionName = "gps_fix_status";
+
+const Gps = mongoose.model("Gps", GpsSchema, GpsCollectionName);
+
+app.route("/gps/findbyid/:collectionId")
+
+    .get(function(req, res) {
+        Gps.findById(req.params.collectionId, function(err, foundGps) {
+            if (!err) {
+                res.send(foundGps);
             } else {
                 res.send("The error is: " + err);
             }
@@ -898,11 +606,14 @@ app.route("/full-link-general/findbyid/:collectionId")
     });
 
 
+// Serve static assets in production
+// if (process.env.NODE_ENV === 'production') {
+app.use(express.static(path.join(__dirname, 'build')));
 
-
-
-
-
+app.get("/*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "build", "index.html"))
+});
+// }
 
 
 // catch 404 and forward to error handler

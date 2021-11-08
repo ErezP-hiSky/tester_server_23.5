@@ -5,13 +5,16 @@ const db = config.get('mongoURI');
 const connectDB = () => {
     mongoose.connect(db, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        ignoreUndefined: true
     })
     .then(() => console.log('MongoDB connected...'))
     .catch(err => {
         console.log(`Error in connection or no internet... The error is: ${err}`);
         process.exit(1);
-    });     
+    }); 
+      
 }
 
 module.exports = connectDB;
