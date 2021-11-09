@@ -23,8 +23,6 @@ router.get("/only_finished", function(req, res) {
     });
 });
 
-
-
 router.get("/findbyUnitSN/:unitSN", function (req, res) {
     GeneralTestDataTemp.find({unit_SN: 
         { $eq: req.params.unitSN } ,
