@@ -605,7 +605,7 @@ app.route("/full-link-general/findbyid/:collectionId")
         });
     });
 
-
+    
 // Serve static assets in production
 // if (process.env.NODE_ENV === 'production') {
 app.use(express.static(path.join(__dirname, 'build')));

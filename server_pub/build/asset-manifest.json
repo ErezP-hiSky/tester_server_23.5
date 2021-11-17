@@ -1,24 +1,24 @@
 {
   "files": {
-    "main.css": "/static/css/main.e50b50dd.chunk.css",
-    "main.js": "/static/js/main.a799cf4f.chunk.js",
-    "main.js.map": "/static/js/main.a799cf4f.chunk.js.map",
+    "main.css": "/static/css/main.42817fab.chunk.css",
+    "main.js": "/static/js/main.e7c4164a.chunk.js",
+    "main.js.map": "/static/js/main.e7c4164a.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.24464db5.js",
     "runtime-main.js.map": "/static/js/runtime-main.24464db5.js.map",
-    "static/js/2.b3b3c300.chunk.js": "/static/js/2.b3b3c300.chunk.js",
-    "static/js/2.b3b3c300.chunk.js.map": "/static/js/2.b3b3c300.chunk.js.map",
+    "static/js/2.d247aebb.chunk.js": "/static/js/2.d247aebb.chunk.js",
+    "static/js/2.d247aebb.chunk.js.map": "/static/js/2.d247aebb.chunk.js.map",
     "static/js/3.26133bef.chunk.js": "/static/js/3.26133bef.chunk.js",
     "static/js/3.26133bef.chunk.js.map": "/static/js/3.26133bef.chunk.js.map",
     "index.html": "/index.html",
-    "static/css/main.e50b50dd.chunk.css.map": "/static/css/main.e50b50dd.chunk.css.map",
-    "static/js/2.b3b3c300.chunk.js.LICENSE.txt": "/static/js/2.b3b3c300.chunk.js.LICENSE.txt",
+    "static/css/main.42817fab.chunk.css.map": "/static/css/main.42817fab.chunk.css.map",
+    "static/js/2.d247aebb.chunk.js.LICENSE.txt": "/static/js/2.d247aebb.chunk.js.LICENSE.txt",
     "static/media/main.scss": "/static/media/Ku_Antenna_in_Lab_lite.4522971b.jpg",
     "static/media/hiskyLogo.3bd4f31e.PNG": "/static/media/hiskyLogo.3bd4f31e.PNG"
   },
   "entrypoints": [
     "static/js/runtime-main.24464db5.js",
-    "static/js/2.b3b3c300.chunk.js",
-    "static/css/main.e50b50dd.chunk.css",
-    "static/js/main.a799cf4f.chunk.js"
+    "static/js/2.d247aebb.chunk.js",
+    "static/css/main.42817fab.chunk.css",
+    "static/js/main.e7c4164a.chunk.js"
   ]
 }

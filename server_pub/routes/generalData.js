@@ -13,6 +13,16 @@ router.get("/", function(req, res) {
     });
 });
 
+router.get('/last', (req,res) =>{
+    GeneralTestDataTemp.findOne({}, {}, { sort: { 'Test_Date' : -1 } }, (err, result) => {
+        if (!err) {
+            res.send(result);
+        } else {
+            res.send("The error is: " + err)
+        }
+    })
+})
+
 router.get("/only_finished", function(req, res) {
     GeneralTestDataTemp.find({final_test_result: {$ne: "started"}}, function(err, foundGeneralTestDataTemp) {
         if (!err) {
@@ -79,6 +89,20 @@ router.get("/findbyid/:collectionId", function (req, res) {
     });
 });
 
+
+router.get("/findbyDate/:startDate/:stopDate", function (req, res) {
+    GeneralTestDataTemp.find({Test_Date: 
+        {$gte: new Date(req.params.startDate), 
+            $lte: new Date(req.params.stopDate)} 
+        },
+        function(err, foundGeneralTestDataTemp) {
+            if (!err) {
+                res.send(foundGeneralTestDataTemp);
+            } else {
+                res.send("The error is: " + err);
+            }
+        });
+});
 
 
 module.exports = router;
