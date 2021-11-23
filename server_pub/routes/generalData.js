@@ -62,12 +62,16 @@ router.get("/findbyUnitSNrange/:unitSNfrom/:unitSNto", function (req, res) {
     });
 });
 
-router.get("/findbyUnitSNrangeNdate/:unitSNfrom/:unitSNto/dateFrom/:DateFrom/dateTo/:DateTo", function (req, res) {
+router.get("/findbyUnitSNrangeNdate/:unitSNfrom/:unitSNto/dateFrom" + 
+    "/:DateFrom/dateTo/:DateTo/passfail/:passfail", function (req, res) {
+    const passOrFail = req.params.passfail;
+    const testResultFilter = passOrFail === 'all' ? {$ne: "started"} :
+        passOrFail === 'onlyPass' ? {$eq: "pass"} : {$eq: "fail"};
     GeneralTestDataTemp.find({ unit_SN: { $gte: req.params.unitSNfrom, 
                 $lte: req.params.unitSNto },
                 Test_Date: {$gte: new Date(req.params.DateFrom), 
                     $lte: new Date(req.params.DateTo)},
-                final_test_result: {$ne: "started"}}, 
+                final_test_result: testResultFilter}, 
                 function(err, foundGeneralTestDataTemp) {
         if (!err) {
             // console.log(`found is ${foundGeneralTestDataTemp}`);
